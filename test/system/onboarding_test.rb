@@ -16,7 +16,7 @@ class OnboardingTest < ApplicationSystemTestCase
     with_feature(FeatureFlag::ORGANIZATIONS, enabled: false, actor: @user) do
       visit sign_in_path
 
-      click_link "login as #{@user[:handle]}"
+      click_link @user[:handle]
 
       visit organization_onboarding_path
 
@@ -27,7 +27,7 @@ class OnboardingTest < ApplicationSystemTestCase
   test "onboarding an organization with a single gem and user" do
     visit sign_in_path
 
-    click_link "login as #{@user[:handle]}"
+    click_link @user[:handle]
 
     visit organization_onboarding_path
 
@@ -57,7 +57,7 @@ class OnboardingTest < ApplicationSystemTestCase
   test "onboarding an organization with multiple gems and users" do
     visit sign_in_path
 
-    click_link "login as #{@user[:handle]}"
+    click_link @user[:handle]
 
     visit organization_onboarding_name_path
 
@@ -87,7 +87,7 @@ class OnboardingTest < ApplicationSystemTestCase
   test "onboarding an organization with many different user roles" do
     visit sign_in_path
 
-    click_link "login as #{@user[:handle]}"
+    click_link @user[:handle]
 
     visit organization_onboarding_name_path
 
@@ -121,7 +121,7 @@ class OnboardingTest < ApplicationSystemTestCase
 
     visit sign_in_path
 
-    click_link "login as #{@user[:handle]}"
+    click_link @user[:handle]
 
     visit organization_onboarding_name_path
 

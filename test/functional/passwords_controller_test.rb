@@ -106,7 +106,7 @@ class PasswordsControllerTest < ActionDispatch::IntegrationTest
         get edit_password_path, params: { token: @user.confirmation_token, reason: "compromised" }
 
         assert_response :success
-        assert_select "h3", I18n.t("passwords.edit.compromised_heading")
+        assert page.has_content?(I18n.t("passwords.edit.compromised_heading"))
       end
     end
 
@@ -115,7 +115,7 @@ class PasswordsControllerTest < ActionDispatch::IntegrationTest
         get edit_password_path, params: { token: @user.confirmation_token }
 
         assert_response :success
-        assert_select "h3", { text: I18n.t("passwords.edit.compromised_heading"), count: 0 }
+        assert_not page.has_content?(I18n.t("passwords.edit.compromised_heading"))
       end
     end
 
@@ -164,7 +164,7 @@ class PasswordsControllerTest < ActionDispatch::IntegrationTest
         assert_webauthn_form
         assert_select "form[action=?]", otp_edit_password_url(token: @user.confirmation_token) do
           assert_select "input[type=text][autocomplete=off]" # no autocomplete for recovery code only
-          assert_select "input[type=submit][value=?]", I18n.t("authenticate")
+          assert_select "button[type=submit]", text: I18n.t("authenticate")
         end
         assert page.has_content?("Recovery code"), "Expect recovery code form"
         refute_signed_in
@@ -227,7 +227,7 @@ class PasswordsControllerTest < ActionDispatch::IntegrationTest
           post otp_edit_password_path, params: { token: @user.confirmation_token, otp: "wrong" }
 
           assert_response :unauthorized
-          assert_select "#flash_alert", "Your OTP code is incorrect."
+          assert page.has_content?("Your OTP code is incorrect.")
           assert_otp_form
 
           refute_signed_in
@@ -299,7 +299,7 @@ class PasswordsControllerTest < ActionDispatch::IntegrationTest
         post webauthn_edit_password_path, params: { token: @user.confirmation_token }
 
         assert_response :unauthorized
-        assert_select "#flash_alert", "Credentials required"
+        assert page.has_content?("Credentials required")
         assert_webauthn_form
 
         refute_signed_in
@@ -315,7 +315,7 @@ class PasswordsControllerTest < ActionDispatch::IntegrationTest
         }
 
         assert_response :unauthorized
-        assert_select "#flash_alert", "WebAuthn::ChallengeVerificationError"
+        assert page.has_content?("WebAuthn::ChallengeVerificationError")
         assert_webauthn_form
 
         refute_signed_in
@@ -393,7 +393,7 @@ class PasswordsControllerTest < ActionDispatch::IntegrationTest
         }
 
         assert_response :unprocessable_content
-        assert_select "#flash_alert", "Your password could not be changed. Please try again."
+        assert page.has_content?("Your password could not be changed. Please try again.")
         assert_select "h1", "Reset password"
         assert_select "#errorExplanation", /Password is too short \(minimum is 10 characters\)/
         assert_select "form[action=?]", password_path do
@@ -493,7 +493,7 @@ class PasswordsControllerTest < ActionDispatch::IntegrationTest
     assert_select "h1", "Multi-factor authentication"
     assert_select "form[action=?]", otp_edit_password_url(token: @user.confirmation_token) do
       assert_select "input[type=text][autocomplete=one-time-code]"
-      assert_select "input[type=submit][value=?]", I18n.t("authenticate")
+      assert_select "button[type=submit]", text: I18n.t("authenticate")
     end
   end
 
@@ -501,7 +501,7 @@ class PasswordsControllerTest < ActionDispatch::IntegrationTest
     assert_select "h1", "Multi-factor authentication"
     assert_select "p", "Authenticate with a security device such as Touch ID, YubiKey, etc."
     assert_select "form.js-webauthn-session--form[action=?]", webauthn_edit_password_url(token: @user.confirmation_token) do
-      assert_select "input[type=submit][value=?]", I18n.t("multifactor_auths.prompt.sign_in_with_webauthn_credential")
+      assert_select "button[type=submit]", text: I18n.t("multifactor_auths.prompt.sign_in_with_webauthn_credential")
     end
   end
 
@@ -511,7 +511,7 @@ class PasswordsControllerTest < ActionDispatch::IntegrationTest
       assert_select "input[type=password][autocomplete=new-password][name=?]", "password_reset[password]"
       assert_select "input[type=checkbox][name=?]", "password_reset[reset_api_key]"
       assert_select "input[type=checkbox][name=?]", "password_reset[reset_api_keys]"
-      assert_select "input[type=submit][value=?]", I18n.t("passwords.edit.submit")
+      assert_select "button[type=submit]", text: I18n.t("passwords.edit.submit")
     end
   end
 end
